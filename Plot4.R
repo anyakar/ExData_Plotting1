@@ -1,12 +1,12 @@
-#Reading in data from unzipped file
-data = read.table("household_power_consumption.txt", sep=";", header = TRUE, na.strings ="?", stringsAsFactors = FALSE)
+#Reading in data from unzipped file using sqldf
+library(sqldf)
+data <- read.csv.sql("household_power_consumption.txt", sep=";", header = TRUE, stringsAsFactors = FALSE, sql = 'select * from file where Date = "1/2/2007" OR Date = "2/2/2007"')
 
-#Subsetting to 2/1/2007 and 2/2/2007 using a logical index (note, that the format is d/m/Y)
-index <- data[,1] == "1/2/2007" | data[,1] == "2/2/2007"
-data2 <- data[index,] #subsetting by index
+# Replacing "?" with NAs
+data[data=="?"] <- NA
 
-#Convertting date and time to POSITXct date/time format - one column out of two using strptime function
-dt <- cbind(data.frame(strptime(paste(data2[,1], data2[,2]), "%d/%m/%Y %H:%M:%S")), data2[3:9])
+# Convert date and time to POSITXct date/time format - one column out of two using strptime function
+dt <- cbind(data.frame(strptime(paste(data[,1], data[,2]), "%d/%m/%Y %H:%M:%S")), data[3:9])
 names(dt)[1] = "Date_and_time"
 
 #Plot 4
